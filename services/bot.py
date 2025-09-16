@@ -29,7 +29,11 @@ class EmbeddingBot(IHuggingFaceBot):
         self.llm = self.start_llm()
 
     def task(self):
+        # TODO implement embedding task
         return "embedding"
 
     def start_llm(self):
         return HuggingFaceEmbeddings(model_name=self.model)
+
+
+# TODO CREATE SUMMARIZATION BOT
