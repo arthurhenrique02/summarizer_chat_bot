@@ -44,7 +44,11 @@ class SummarizationBot(AHuggingFaceBot, ADocumentProcessor):
         self.llm = self.start_llm()
 
     def task(self, documents: typing.List[Document], *args, **kwargs):
-        return load_summarize_chain(self.llm, chain_type="map_reduce").run(documents)
+        return load_summarize_chain(
+            self.llm,
+            chain_type="map_reduce",
+            token_max=1000,
+        ).invoke({"input_documents": documents})
 
     def start_llm(self) -> HuggingFacePipeline:
         return HuggingFacePipeline(
