@@ -13,7 +13,11 @@ class ADocumentProcessor(ABC):
             chunk_overlap=100,
             length_function=len,
         )
-        return text_splitter.split_documents(text)
+        return [
+            Document(page_content=chunk)
+            for chunk in text_splitter.split_text(text)
+            if chunk
+        ]
 
 
 class AHuggingFaceBot(ABC):
