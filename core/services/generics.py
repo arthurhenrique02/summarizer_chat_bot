@@ -10,7 +10,7 @@ class ADocumentProcessor(ABC):
     def separate_text_into_documents(self, text: str) -> typing.List[Document]:
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=800,
-            chunk_overlap=100,
+            chunk_overlap=50,
             length_function=len,
         )
         return [

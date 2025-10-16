@@ -8,7 +8,7 @@ from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_huggingface.llms import HuggingFacePipeline
 from transformers import AutoTokenizer, pipeline
 
-from services.utils import ADocumentProcessor, AHuggingFaceBot
+from core.services.utils import ADocumentProcessor, AHuggingFaceBot
 
 
 class EmbeddingBot(AHuggingFaceBot, ADocumentProcessor):
@@ -38,16 +38,26 @@ class EmbeddingBot(AHuggingFaceBot, ADocumentProcessor):
 
 class SummarizationBot(AHuggingFaceBot, ADocumentProcessor):
     llm: HuggingFacePipeline
+    combine_prompt: PromptTemplate
 
-    def __init__(self, name: str, prompt: PromptTemplate, model: str):
+    def __init__(
+        self,
+        name: str,
+        prompt: PromptTemplate,
+        model: str,
+        combine_prompt: PromptTemplate,
+    ):
         super().__init__(name, prompt, model)
         self.llm = self.start_llm()
+        self.combine_prompt = combine_prompt
 
     def task(self, documents: typing.List[Document], *args, **kwargs):
         return load_summarize_chain(
             self.llm,
             chain_type="map_reduce",
-            token_max=1000,
+            token_max=1024,
+            map_prompt=self.prompt_template,
+            combine_prompt=self.combine_prompt,
         ).invoke({"input_documents": documents})
 
     def start_llm(self) -> HuggingFacePipeline:
@@ -58,7 +68,7 @@ class SummarizationBot(AHuggingFaceBot, ADocumentProcessor):
                 tokenizer=AutoTokenizer.from_pretrained(
                     self.model, from_tf=False, from_flax=False, use_fast=True
                 ),
-                device_map="cpu",
+                device_map="cuda:0",
                 framework="pt",
                 max_new_tokens=1000,
             ),
