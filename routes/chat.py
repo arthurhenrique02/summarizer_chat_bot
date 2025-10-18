@@ -51,7 +51,7 @@ summarization_bot = SummarizationBot(
 
 @router.post("/summarize")
 async def summarize(
-    chat_message: typing.Annotated[str, Form()],
+    chat_message: typing.Annotated[str | None, Form()] = None,
     file: typing.Annotated[UploadFile | None, File()] = None,
 ):
     f_content = read_file_content(file) if file else ""
@@ -59,4 +59,6 @@ async def summarize(
     embedded_documents = embedding_bot.task(chat_message)
     summary = summarization_bot.task(embedded_documents)
 
-    return JSONResponse(content={"summary": summary}, status_code=200)
+    return JSONResponse(
+        content={"summary": summary.get("output_text")}, status_code=200
+    )
