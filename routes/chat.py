@@ -1,4 +1,5 @@
 import os
+import typing
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, File, Form, UploadFile
@@ -6,6 +7,7 @@ from fastapi.responses import JSONResponse
 from langchain_core.prompts import PromptTemplate
 
 from core.services.bot import EmbeddingBot, SummarizationBot
+from core.services.utils import read_file_content
 
 load_dotenv()
 
@@ -46,14 +48,14 @@ summarization_bot = SummarizationBot(
     ),
 )
 
-import typing
-
 
 @router.post("/summarize")
 async def summarize(
     chat_message: typing.Annotated[str, Form()],
     file: typing.Annotated[UploadFile | None, File()] = None,
 ):
+    f_content = read_file_content(file) if file else ""
+    chat_message += "\n\n" + f_content
     embedded_documents = embedding_bot.task(chat_message)
     summary = summarization_bot.task(embedded_documents)
 

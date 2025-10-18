@@ -8,7 +8,7 @@ from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_huggingface.llms import HuggingFacePipeline
 from transformers import AutoTokenizer, pipeline
 
-from core.services.utils import ADocumentProcessor, AHuggingFaceBot
+from core.services.generics import ADocumentProcessor, AHuggingFaceBot
 
 
 class EmbeddingBot(AHuggingFaceBot, ADocumentProcessor):
